@@ -1,9 +1,25 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import ToDoList, Item
+from .forms import CreateNewList
 
 # Create your views here.
 
-def index(response):
-    return HttpResponse("<h1>tech with Lema!</h1>")
-def v1(response):
-    return HttpResponse("<h1>View1!")
+def index(response, id):
+    my_dict = {}
+    ls = ToDoList.objects.get(id=id)   
+    return render(response, "main/list.html", {"ls":ls})
+    
+def home(response):
+    return render(response, "main/home.html", {})
+
+def create(response):
+    if response.method == "POST":
+        form = CreateNewList(response.POST)
+        if form.is_valid():
+            n = form.cleaned_data["name"]
+            t = ToDoList(name=n)
+            t.save()
+    else:
+        form = CreateNewList()
+    return render(response, "main/create,html", {"form":form})
